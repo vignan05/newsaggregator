@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>News Aggregator - {{ category }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>{{ category }}</h1>
+    <div class="articles">
+        {% if articles %}
+        {% for article in articles %}
+        <div class="article">
+            <h2>{{ article['title'] }}</h2>
+            <p>{{ article['description'] }}</p>
+            <a href="/news/{{ article['url'] }}" class="read-more">Read more</a>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p>No articles found for the selected category.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

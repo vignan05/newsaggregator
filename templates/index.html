@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>News Aggregator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="categories">
+            <h2>Categories</h2>
+            <div class="category-links">
+                <div class="category-link"><a href="/category/entertainment">Entertainment</a></div>
+                <div class="category-link"><a href="/category/business">Business</a></div>
+                <div class="category-link"><a href="/category/health">Health</a></div>
+                <div class="category-link"><a href="/category/science">Science</a></div>
+                <div class="category-link"><a href="/category/sports">Sports</a></div>
+                <div class="category-link"><a href="/category/technology">Technology</a></div>
+            </div>
+        </div>
+
+        <div class="exit">
+            <a href="{{url_for('logout')}}">logout</a>
+        </div>
+
+        <div><a href="{{url_for('send_newsletter')}}">Newsletter</a></div>
+
+        <div class="top-headlines">
+            <h1>Top Headlines</h1>
+            <div class="articles">
+                {% if top_headlines %}
+                {% for article in top_headlines %}
+                <div class="article">
+                    <h2>{{ article['title'] }}</h2>
+                    <p>{{ article['description'] }}</p>
+                    <a href="/news/{{ article['url'] }}" class="read-more">Read more</a>
+                    
+                </div>
+                {% endfor %}
+                {% else %}
+                <p>No articles found for the selected category.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

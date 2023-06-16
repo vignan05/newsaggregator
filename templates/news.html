@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>News Aggregator - Article</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    {% if article %}
+    <div class="article">
+        <h2>{{ article['title'] }}</h2>
+        <p>{{ article['description'] }}</p>
+        <p>Published by: {{ article['source']['name'] }}</p>
+        <a href="{{ article['url'] }}" class="source-link">Read full article</a><br>
+        <a href="{{ url_for('save_article', title=article['title'], url=article['url']) }}">save article</a>
+    </div>
+    {% else %}
+    <p>No article found.</p>
+    {% endif %}
+</body>
+</html>
