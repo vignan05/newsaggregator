@@ -15,19 +15,19 @@ app.config['SESSION_TYPE']='filesystem'
 Session(app)
 
 # Database Configuration
-'''
+
 DB_HOST = 'localhost'
 DB_USER = 'root'
 DB_PASSWORD = 'admin'
 DB_NAME = 'news_aggregator'
-'''
+
 
 
 # API Configuration
 API_KEY = '1cb52271030c45bcb934b442580ef362'
 
 # Database Connection
-'''
+
 mydb = mysql.connector.connect(
     host=DB_HOST,
     user=DB_USER,
@@ -46,7 +46,7 @@ with mysql.connector.connect(host=host,user=user,password=password,db=db) as con
     cursor.execute('create table if not exists articles(id int NOT NULL PRIMARY KEY AUTO_INCREMENT,title varchar(255) NOT NULL,description text,source_name varchar(255),url varchar(1000))')
     cursor.execute('create table if not exists newsletter(username varchar(15),headline varchar(255),artcle_url varchar(1000))')
 mydb=mysql.connector.connect(host=host,user=user,password=password,db=db)
-
+'''
 
 #cursor = mydb.cursor()
 
