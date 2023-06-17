@@ -7,6 +7,7 @@ from itsdangerous import URLSafeTimedSerializer
 from apscheduler.schedulers.background import BackgroundScheduler
 import requests
 import mysql.connector
+import os
 
 app = Flask(__name__)
 app.secret_key=secret_key
@@ -14,21 +15,38 @@ app.config['SESSION_TYPE']='filesystem'
 Session(app)
 
 # Database Configuration
+'''
 DB_HOST = 'localhost'
 DB_USER = 'root'
 DB_PASSWORD = 'admin'
 DB_NAME = 'news_aggregator'
+'''
+
 
 # API Configuration
 API_KEY = '1cb52271030c45bcb934b442580ef362'
 
 # Database Connection
+'''
 mydb = mysql.connector.connect(
     host=DB_HOST,
     user=DB_USER,
     password=DB_PASSWORD,
     database=DB_NAME
 )
+'''
+db=os.environ['RDS_DB_NAME']
+user=os.environ['RDS_USERNAME']
+password=os.environ['RDS_PASSWORD']
+host=os.environ['RDS_HOSTNAME']
+port=os.environ['RDS_PORT']
+with mysql.connector.connect(host=host,user=user,password=password,db=db) as conn:
+    cursor=conn.cursor(buffered=True)
+    cursor.execute('create table if not exists users(username varchar(15) NOT NULL primary key,password varchar(15),email varchar(80),email_status enum("confirmed","not_confirmed") DEFAULT "not_confirmed")')
+    cursor.execute('create table if not exists articles(id int NOT NULL PRIMARY KEY AUTO_INCREMENT,title varchar(255) NOT NULL,description text,source_name varchar(255),url varchar(1000))')
+    cursor.execute('create table if not exists newsletter(username varchar(15),headline varchar(255),artcle_url varchar(1000))')
+mydb=mysql.connector.connect(host=host,user=user,password=password,db=db)
+
 
 #cursor = mydb.cursor()
 
@@ -90,7 +108,6 @@ def home():
         cursor=mydb.cursor(buffered=True)
         cursor.execute('select email_status from users where username=%s',[username])
         status=cursor.fetchone()[0]
-        #cursor.close()
         if status=='confirmed':
             # Get top headlines
             top_headlines_url = f'https://newsapi.org/v2/top-headlines?country=us&apiKey={API_KEY}'
@@ -236,7 +253,6 @@ def confirm(token):
         serializer=URLSafeTimedSerializer(secret_key)
         email=serializer.loads(token,salt=salt1,max_age=120)
     except Exception as e:
-        #print(e)
         abort(404,'Link expired')
     else:
         cursor=mydb.cursor(buffered=True)
@@ -312,68 +328,6 @@ def logout():
     else:
         return redirect(url_for('login'))
 
-'''@app.route('/subscribe',methods=['GET','POST'])
-def subscribe():
-    if session.get('user'):
-        if request.method=='POST':
-            email = request.form['email']
-            username=session.get('user')
-            # Store the email in your database or perform any necessary validation
-            # Here, we're just sending a confirmation message to the subscriber
-            cursor=mydb.cursor(buffered=True)
-            cursor.execute('insert into subscribers(username,email) values(%s,%s)',(username,email))
-            mydb.commit()
-            cursor.close()
-            subject='Subscription Confirmation'
-            body='Thank you for subscribing to our news letter'
-            sendmail(to=email,body=body,subject=subject)
-            flash('Subscribed successfully!')
-        return render_template('subscription.html')
-    return redirect(url_for('login'))
-
-@app.route('/generate_newsletter')
-def generate_newsletter():
-    top_headlines_url = f'https://newsapi.org/v2/top-headlines?country=us&apiKey={API_KEY}'
-    top_headlines_response = requests.get(top_headlines_url)
-    top_headlines_data = top_headlines_response.json()
-    newsletter_content = f"Latest News\n\n"
-
-    articles = top_headlines_data['articles']
-    for article in articles:
-        title = article['title']
-        description = article['description']
-        url = article['url']
-
-        # Create a card-like structure for each article
-        article_card = f"Title: {title}\nDescription: {description}\nURL: {url}\n\n"
-
-        # Add the article card to the newsletter content
-        newsletter_content += article_card
-
-    return newsletter_content
-
-@app.route('/send_newsletter')
-def send_newsletter():
-    cursor=mydb.cursor(buffered=True)
-    cursor.execute('select email from subscribers')
-    subscribers=cursor.fetchall()
-    cursor.close()
-    newsletter_content = generate_newsletter()
-    for subscriber in subscribers:
-        subject='Top headlines'
-        body=newsletter_content
-        sendmail(to=subscriber,body=body,subject=subject)
-    return 'newsletter sent successfully'
-
-@app.route('/send_email_daily')
-def send_email_daily():
-    send_newsletter()
-    return 'Daily email sent!'
-
-scheduler = BackgroundScheduler(daemon=True)
-scheduler.add_job(send_email_daily, 'cron', hour=11)
-scheduler.start()'''
-
 @app.route('/save_article',methods=['GET'])
 def save_article():
     if session.get('user'):
@@ -384,10 +338,11 @@ def save_article():
         cursor.execute('insert into newsletter(username,headline,article_url) values(%s,%s,%s)',(username,hl,article_url))
         mydb.commit()
         cursor.close()
-        return render_template('savedarticle.html')
+        flash('Article saved successfully !')
+        return redirect(request.referrer)
     else:
         return redirect(url_for('login')) 
-    return render_template('savedarticle.html')
+    return render_template('news.html')
 
 @app.route('/generate_newsletter')
 def generate_newsletter():
@@ -424,6 +379,12 @@ def send_newsletter():
         return redirect(url_for('login'))
     return redirect(url_for('home'))
 
+@app.route('/aboutus')
+def aboutus():
+    if session.get('user'):
+        return render_template('aboutus.html')
+    else:
+        return redirect(url_for('login'))
 
 if __name__ == '__main__':
-    app.run(debug=True,use_reloader=True)
+    app.run()

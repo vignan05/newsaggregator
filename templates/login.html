@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='login.css')}}">
+  <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='login.css')}}">
 </head>
 {% with messages = get_flashed_messages() %}
   {% if messages %}
@@ -11,16 +11,21 @@
   {% endif %}
 {% endwith %}
 <body>
+  <div class="header">
+    <h1>NEWS WAVE</h1>
+  </div>
+  <div class="background-image"></div>
   <div class="container">
-    <h1>Login</h1>
+    <h2>Login</h2>
     <form method="POST">
       <label for="username">Username:</label>
       <input type="text" id="username" name="username" placeholder="Enter your username">
       <label for="password">Password:</label>
       <input type="password" id="password" name="password" placeholder="Enter your password">
-      <a href="{{url_for('forgot')}}">Forget password?</a><p class="no-account">No Account?
-      <a href="{{url_for('registration')}}">Sign Up</a></p><br/>
-      <input type="submit">
+      <a href="{{url_for('forgot')}}">Forgot password?</a>
+      <p class="no-account">No Account? <a href="{{url_for('registration')}}">Sign Up</a></p>
+      <br>
+      <input type="submit" value="Submit">
     </form>
   </div>
 </body>

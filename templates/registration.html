@@ -3,15 +3,30 @@
 <head>
     <title>Registration Page</title>
     <link rel="stylesheet" href="{{url_for('static',filename='registration.css')}}">
+    <style>
+        .top-bar {
+            background-color: black;
+            padding: 10px;
+            text-align: center;
+            color: white;
+        }
+
+        .top-bar h1 {
+            margin: 0;
+        }
+    </style>
 </head>
 {% with messages = get_flashed_messages() %}
-  {% if messages %}
-    {% for message in messages %}
-      <center><b>{{ message }}</b></center> 
-    {% endfor %}
-  {% endif %}
+    {% if messages %}
+        {% for message in messages %}
+            <center><b>{{ message }}</b></center> 
+        {% endfor %}
+    {% endif %}
 {% endwith %}
 <body>
+    <div class="header">
+        <h1>NEWS WAVE</h1>
+    </div>
     <div class="container">
         <h2>Registration</h2>
         <form method="POST">
