@@ -4,6 +4,13 @@
     <title>News Wave</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    {% for message in messages %}
+      <center><b>{{ message }}</b></center> 
+    {% endfor %}
+  {% endif %}
+{% endwith %}
 <body>
     <div class="navbar">
         <div class="navbar-brand">
