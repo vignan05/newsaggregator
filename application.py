@@ -9,10 +9,10 @@ import requests
 import mysql.connector
 import os
 
-app = Flask(__name__)
-app.secret_key=secret_key
-app.config['SESSION_TYPE']='filesystem'
-Session(app)
+application = Flask(__name__)
+application.secret_key=secret_key
+application.config['SESSION_TYPE']='filesystem'
+Session(application)
 
 '''
 # Database Configuration
@@ -50,11 +50,11 @@ mydb=mysql.connector.connect(host=host,user=user,password=password,db=db)
 # API Configuration
 API_KEY = '1cb52271030c45bcb934b442580ef362'
 
-@app.route('/')
+@application.route('/')
 def index():
     return render_template('title.html')
 
-@app.route('/login',methods=['GET','POST'])
+@application.route('/login',methods=['GET','POST'])
 def login():
     if session.get('user'):
         return redirect(url_for('home'))
@@ -86,7 +86,7 @@ def login():
             return render_template('login.html')
     return render_template('login.html')
 
-@app.route('/inactive')
+@application.route('/inactive')
 def inactive():
     if session.get('user'):
         username=session.get('user')
@@ -101,7 +101,7 @@ def inactive():
     else:
         return redirect(url_for('login'))
 
-@app.route('/homepage')
+@application.route('/homepage')
 def home():
     if session.get('user'):
         username=session.get('user')
@@ -138,7 +138,7 @@ def home():
     else:
         return redirect(url_for('login'))
 
-@app.route('/category/<category>')
+@application.route('/category/<category>')
 def show_category(category):
     cursor=mydb.cursor(buffered=True)
     # Get articles for the selected category
@@ -153,7 +153,7 @@ def show_category(category):
 
     return render_template('category.html', category=category, articles=articles)
 
-@app.route('/news/<path:article_url>')
+@application.route('/news/<path:article_url>')
 def show_news(article_url):
     cursor=mydb.cursor(buffered=True)
     # Retrieve article from the database
@@ -201,7 +201,7 @@ def get_article(article_url):
 
     return None
 
-@app.route('/resendconfirmation')
+@application.route('/resendconfirmation')
 def resend():
     if session.get('user'):
         username=session.get('user')
@@ -224,7 +224,7 @@ def resend():
     else:
         return redirect(url_for('login'))
 
-@app.route('/registration',methods=['GET','POST'])
+@application.route('/registration',methods=['GET','POST'])
 def registration():
     if request.method=='POST':
         username=request.form['username']
@@ -247,7 +247,7 @@ def registration():
             return render_template('registration.html')
     return render_template('registration.html')
 
-@app.route('/confirm/<token>')
+@application.route('/confirm/<token>')
 def confirm(token):
     try:
         serializer=URLSafeTimedSerializer(secret_key)
@@ -269,7 +269,7 @@ def confirm(token):
             flash('Email confirmation success')
             return redirect(url_for('login'))
 
-@app.route('/forget',methods=['GET','POST'])
+@application.route('/forget',methods=['GET','POST'])
 def forgot():
     if request.method=='POST':
         email=request.form['email']
@@ -297,7 +297,7 @@ def forgot():
             return render_template('forgot.html')
     return render_template('forgot.html')
 
-@app.route('/reset/<token>',methods=['GET','POST'])
+@application.route('/reset/<token>',methods=['GET','POST'])
 def reset(token):
     try:
         serializer=URLSafeTimedSerializer(secret_key)
@@ -320,7 +320,7 @@ def reset(token):
                 return render_template('newpassword.html')
         return render_template('newpassword.html')
 
-@app.route('/logout')
+@application.route('/logout')
 def logout():
     if session.get('user'):
         session.pop('user')
@@ -328,7 +328,7 @@ def logout():
     else:
         return redirect(url_for('login'))
 
-@app.route('/save_article',methods=['GET'])
+@application.route('/save_article',methods=['GET'])
 def save_article():
     if session.get('user'):
         username=session.get('user')
@@ -344,7 +344,7 @@ def save_article():
         return redirect(url_for('login')) 
     return render_template('news.html')
 
-@app.route('/generate_newsletter')
+@application.route('/generate_newsletter')
 def generate_newsletter():
     if session.get('user'):
         username=session.get('user')
@@ -360,7 +360,7 @@ def generate_newsletter():
             newsletter_content+=article_card
     return newsletter_content
 
-@app.route('/send_newsletter')
+@application.route('/send_newsletter')
 def send_newsletter():
     if session.get('user'):
         username=session.get('user')
@@ -380,7 +380,7 @@ def send_newsletter():
         return redirect(url_for('login'))
     return redirect(url_for('home'))
 
-@app.route('/aboutus')
+@application.route('/aboutus')
 def aboutus():
     if session.get('user'):
         return render_template('aboutus.html')
@@ -388,4 +388,4 @@ def aboutus():
         return redirect(url_for('login'))
 
 if __name__ == '__main__':
-    app.run()
+    application.run()
