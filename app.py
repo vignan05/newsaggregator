@@ -41,7 +41,7 @@ with mysql.connector.connect(host=host,user=user,password=password,db=db) as con
     cursor=conn.cursor(buffered=True)
     cursor.execute('create table if not exists users(username varchar(15) NOT NULL primary key,password varchar(15),email varchar(80),email_status enum("confirmed","not_confirmed") DEFAULT "not_confirmed")')
     cursor.execute('create table if not exists articles(id int NOT NULL PRIMARY KEY AUTO_INCREMENT,title varchar(255) NOT NULL,description text,source_name varchar(255),url varchar(1000))')
-    cursor.execute('create table if not exists newsletter(username varchar(15),headline varchar(255),article_url varchar(1000))')
+    cursor.execute('create table if not exists news_letter(username varchar(15),headline varchar(255),article_url varchar(1000))')
 mydb=mysql.connector.connect(host=host,user=user,password=password,db=db)
 
 
@@ -335,7 +335,7 @@ def save_article():
         hl = request.args.get('title')
         article_url = request.args.get('url')
         cursor=mydb.cursor(buffered=True)
-        cursor.execute('insert into newsletter(username,headline,article_url) values(%s,%s,%s)',(username,hl,article_url))
+        cursor.execute('insert into news_letter(username,headline,article_url) values(%s,%s,%s)',(username,hl,article_url))
         mydb.commit()
         cursor.close()
         flash('Article saved successfully !')
@@ -350,7 +350,7 @@ def generate_newsletter():
         username=session.get('user')
         newsletter_content = f"Latest News\n\n"
         cursor=mydb.cursor(buffered=True)
-        cursor.execute('select headline,article_url from newsletter where username=%s',[username])
+        cursor.execute('select headline,article_url from news_letter where username=%s',[username])
         contents=cursor.fetchall()
         cursor.close()
         for content in contents:
@@ -371,7 +371,7 @@ def send_newsletter():
         subject='Top headlines'
         body=newsletter_content
         sendmail(to=email,body=body,subject=subject)
-        cursor.execute('delete from newsletter where username=%s',[username])
+        cursor.execute('delete from news_letter where username=%s',[username])
         mydb.commit()
         cursor.close()
         flash('Newsletter sent to your mail successfully!')
