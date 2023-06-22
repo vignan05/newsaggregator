@@ -41,7 +41,7 @@ with mysql.connector.connect(host=host,user=user,password=password,db=db) as con
     cursor=conn.cursor(buffered=True)
     cursor.execute('create table if not exists users(username varchar(15) NOT NULL primary key,password varchar(15),email varchar(80),email_status enum("confirmed","not_confirmed") DEFAULT "not_confirmed")')
     cursor.execute('create table if not exists articles(id int NOT NULL PRIMARY KEY AUTO_INCREMENT,title varchar(255) NOT NULL,description text,source_name varchar(255),url varchar(1000))')
-    cursor.execute('create table if not exists newsletter(username varchar(15),headline varchar(255),article_url varchar(1000))')
+    cursor.execute('create table if not exists newsletter(username varchar(15),headline varchar(255),artcle_url varchar(1000))')
 mydb=mysql.connector.connect(host=host,user=user,password=password,db=db)
 
 
